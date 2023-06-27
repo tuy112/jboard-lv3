@@ -9,12 +9,12 @@ module.exports = (sequelize, DataTypes) => {
     }
   }
   user.init({
-    userId: DataTypes.STRING,
-    passwordl: DataTypes.STRING,
+    usersId: DataTypes.STRING,
+    password: DataTypes.STRING,
     passwordCheck: DataTypes.STRING
   }, {
     sequelize,
-    modelName: 'user',
+    modelName: 'users',
   });
   return user;
 };

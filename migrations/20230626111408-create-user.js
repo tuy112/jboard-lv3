@@ -9,10 +9,10 @@ module.exports = {
         primaryKey: true,
         type: Sequelize.INTEGER
       },
-      userId: {
+      usersId: {
         type: Sequelize.STRING
       },
-      passwordl: {
+      password: {
         type: Sequelize.STRING
       },
       passwordCheck: {

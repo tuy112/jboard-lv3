@@ -50,10 +50,10 @@ document.querySelector('.signupBtn').addEventListener('click', function(event) {
     
     let userId = document.getElementById('usersId').value;
     let password = document.getElementById('password').value;
-    let email = document.getElementById('email').value;
+    let passwordCheck = document.getElementById('passwordCheck').value;
     
     // 입력값 유효성 검사
-    if (userId.trim() === '' || password.trim() === '' || email.trim() === '') {
+    if (userId.trim() === '' || password.trim() === '' || passwordCheck.trim() === '') {
       alert('모든 필드에 정보를 입력해주세요!');
       return;
     }
@@ -64,7 +64,7 @@ document.querySelector('.signupBtn').addEventListener('click', function(event) {
       headers: {
         'Content-Type': 'application/json'
       },
-      body: JSON.stringify({ userId: userId, password: password, email: email })
+      body: JSON.stringify({ userId: userId, password: password, passwordCheck: passwordCheck })
     })
     .then(function(response) {
       if (response.ok) {
