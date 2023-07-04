@@ -23,6 +23,11 @@ app.use('/api', [usersRouter]);
 app.use('/api', [postsRouter]);
 // Middleware ==================================================
 
+app.get('/set-cookie', (req, res) => {
+    let expires = new Date();
+    expires.setMinutes(expires.getMinutes() + 60);
+});
+
 // HTML, CSS
 app.use(express.static(path.join(__dirname, 'assets')));
 app.get('/', (req, res) => {

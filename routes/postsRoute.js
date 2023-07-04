@@ -31,22 +31,6 @@ router.get('/posts', async (req, res) => {
     return res.status(200).json({ data: posts });
 });
 
-// 본인 게시글 조회 API (GET)
-router.get('/mypost', authMiddleware, async (req, res) => {
-    const { userId } = res.locals.user;
-
-    const posts = await Posts.findAll({
-        attributes: ['userId', 'postId', 'title', 'content', 'createdAt', 'updatedAt'],
-        order: [['createdAt', 'DESC']],
-        where: { userId },
-    });
-    if (!posts) {
-        return res.status(404).json({ message: '게시글이 존재하지 않습니다.' });
-    }
-
-    return res.status(200).json({ data: posts });
-});
-
 // 게시글 수정 API (PUT)
 router.put('/posts/:postId', authMiddleware, async (req, res) => {
     const { postId } = req.params;

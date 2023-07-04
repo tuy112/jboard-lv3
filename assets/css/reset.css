@@ -32,6 +32,13 @@ body {
 	line-height: 1.7;
     font-size: 17px;    
     font-family: 'Noto Sans KR', sans-serif;
+	cursor: default;
+}
+h1, h2 {
+    font-weight: 600;
+    font-size: 25px;
+    text-align: center;
+    margin-bottom: 10px;
 }
 a {
 	line-height: 1.6;
