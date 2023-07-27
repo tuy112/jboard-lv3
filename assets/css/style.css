@@ -2,24 +2,34 @@
 #header {
     width: 100%;
     position: relative;
+    background: #fbceb1;
 }
 #header .inner {
-    height: 150px;
+    height: 80px;
+}
+#header h1 a {
+    font-weight: 600;
 }
 .nav {
     position: absolute;
-    left: 43.5%;
+    bottom: 8px;
+    right: 10px;
 }
 .nav .gnb {}
 .nav .gnb li {
     float: left;
-    padding-left: 15px;
+    padding-left: 10px;
 }
 .nav .gnb li:first-child {
     padding-left: 0;
 }
 .nav .gnb li a {
     font-size: 14px;
+    padding: 3px;
+    box-shadow: 2px 2px 1px #666;
+}
+.nav .gnb li a:active {
+    box-shadow: none;
 }
 
 

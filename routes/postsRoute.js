@@ -1,81 +1,123 @@
-const express = require('express');
+const express = require("express");
+const { Posts } = require("../models");
+const authMiddleware = require("../middlewares/authMiddleware");
 const router = express.Router();
 
-// Middleware
-const authMiddleware = require('../middleware/authMiddleware');
-// Model
-const { Posts } = require('../models');
-const { Op } = require('sequelize');
+// 게시글 등록 [POST]
+router.post("/user/addPost", authMiddleware, async (req, res) => {
+  const { userId } = res.locals.user;
+  const { title, content } = req.body;
 
-// 게시글 작성 API (POST)
-router.post('/posts', authMiddleware, async (req, res) => {
-    const { userId } = res.locals.user;
-    const { title, content } = req.body;
+  if (!userId) {
+    res.status(403).json({ errorMessage: "로그인 후 사용 가능합니다." });
+    return;
+  }
 
-    const post = await Posts.create({
-        userId: userId,
-        title: title,
-        content: content,
+  if (!title) {
+    return res.status(400).json({ errorMessage: "제목을 입력해주세요." });
+  }
+
+  if (!content) {
+    return res.status(400).json({ errorMessage: "내용을 입력해주세요." });
+  }
+
+  try {
+    const addPost = await Posts.create({
+      title,
+      content,
+      userId: userId,
     });
 
-    return res.status(201).json({ data: post });
+    return res.status(201).json({ data: addPost });
+  } catch (error) {
+    console.error(error);
+    return res
+      .status(500)
+      .json({ message: "게시글 등록 과정에 오류가 발생하였습니다." });
+  }
 });
 
-// 게시글 목록 조회 API (GET)
-router.get('/posts', async (req, res) => {
+// 게시글 전체 조회 [GET]
+router.get("/user/getPostAll", async (req, res) => {
+  try {
     const posts = await Posts.findAll({
-        attributes: ['postId', 'title', 'content', 'createdAt', 'updatedAt'],
-        order: [['createdAt', 'DESC']],
+      attributes: ["postId", "userId", "title", "content", "createdAt"],
+      order: [["createdAt", "DESC"]],
     });
-
     return res.status(200).json({ data: posts });
+  } catch (error) {
+    console.error(error);
+    return res
+      .status(500)
+      .json({ message: "게시글 전제 조회 과정에 오류가 발생하였습니다." });
+  }
 });
 
-// 게시글 수정 API (PUT)
-router.put('/posts/:postId', authMiddleware, async (req, res) => {
-    const { postId } = req.params;
-    const { userId } = res.locals.user;
-    const { title, content } = req.body;
+// 게시글 수정 [PUT]
+router.put("/user/update/:postId", authMiddleware, async (req, res) => {
+  const { postId } = req.params;
+  const { userId } = res.locals.user;
+  const { title, content } = req.body;
 
-    const post = await Posts.findOne({ where: { postId } });
-    if (!post) {
-        return res.status(404).json({ message: '게시글이 존재하지 않습니다.' });
-    } else if (post.userId !== userId) {
-        return res.status(401).json({ message: '권한이 없습니다.' });
-    }
-
-    await Posts.update(
-        { title, content },
-        {
-            where: {
-                [Op.and]: [{ postId }, { userId }],
-            },
-        },
-    );
-    return res.status(200).json({ data: '게시글이 수정되었습니다.' });
-});
-
-// 게시글 삭제 API (DELETE)
-router.delete('/posts/:postId', authMiddleware, async (req, res) => {
-    const { postId } = req.params;
-    const { userId } = res.locals.user;
-    const { title } = res.req.body;
-
-    const post = await Posts.findOne({ where: { postId } });
-    if (!post) {
-        return res.status(404).json({ message: '게시글이 없습니다.' });
-    } else if (post.userId !== userId) {
-        return res.status(404).json({ message: '권한이 없습니다.' });
-    } else if (post.title !== title) {
-        return res.status(401).json({ message: '제목이 일치하지 않습니다.' });
-    }
-
-    await Posts.destroy({
-        where: {
-            [Op.and]: [{ postId }, { userId }],
-        },
+  try {
+    const post = await Posts.findOne({
+      where: { postId: postId },
     });
-    return res.status(200).json({ data: '게시글이 삭제되었습니다.' });
+    console.log(post);
+
+    if (post.userId !== userId) {
+      return res
+        .status(403)
+        .json({ errorMessage: "게시글을 수정할 권한이 없습니다." });
+    }
+
+    if (!post) {
+      return res
+        .status(404)
+        .json({ errorMessage: "게시글를 찾을 수 없습니다." });
+    }
+
+    await Posts.update({ title, content }, { where: { postId: postId } });
+
+    return res.status(200).json({ message: "게시글 수정을 완료하였습니다." });
+  } catch (error) {
+    console.error(error);
+    return res
+      .status(500)
+      .json({ errorMessage: "게시글 수정 과정에 오류가 발생하였습니다." });
+  }
+});
+
+// 게시글 삭제_DELETE
+router.delete("/user/delete/:postId", authMiddleware, async (req, res) => {
+  const { postId } = req.params;
+  const { userId } = res.locals.user;
+
+  try {
+    const post = await Posts.findOne({
+      where: { postId: postId },
+    });
+    console.log(post);
+
+    if (post.userId !== userId) {
+      return res
+        .status(403)
+        .json({ errorMessage: "게시글을 삭제할 권한이 없습니다." });
+    }
+
+    if (!post) {
+      return res.status(404).json({ errorMessage: "메뉴를 찾을 수 없습니다." });
+    }
+
+    await Posts.destroy({ where: { postId: postId } });
+
+    return res.status(200).json({ message: "게시글 삭제를 완료하였습니다." });
+  } catch (error) {
+    console.error(error);
+    return res
+      .status(500)
+      .json({ errorMessage: "게시글 삭제에 실패하였습니다." });
+  }
 });
 
 module.exports = router;
